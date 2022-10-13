@@ -1,0 +1,23 @@
+version: '3' # versión de docker-compose
+
+services:
+  frontend: #nombre del servicio de frontend
+    build: frontend # ruta del dockerfile del frontend
+    ports:
+      - "4200:4200" # el puerto del frontend
+    container_name: front-container #nombre del contenedor
+    restart: always
+
+  backend: #nombre del servicio de backend
+    build: backend # ruta del dockerfile del backend
+    ports:
+      - "3000:3000" # puerto del backend
+    container_name: back-container #nombre del contenedor
+    restart: always
+    links:
+      - database # enlace al nombre de la base de datos
+
+  database: # nombre base de datos
+    build: database # ruta del dockerfile de la base de datos
+    container_name: database-container #nombre del contenedor
+    restart: always
