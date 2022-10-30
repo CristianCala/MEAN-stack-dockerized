@@ -1,25 +1,40 @@
 const express = require('express');
-const path = require('path');
-const http = require('http');
-const bodyParser = require('body-parser');
+const mysql = require('mysql');
 
-// Api de rutas
-const api = require('.api');
+function connect() {
+    const conex = mysql.createConnection({
+        host: "localhost",
+        user: "user",
+        port: '3306',
+        password: "password",
+        database: "claix",
+        charset  : 'utf8'
+    });
+
+    conex.connect();
+
+    return conex;
+}
+
 const app = express();
 
-// Middlewares
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Header", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
-// Aquí van las rutas
-app.use('/', api);
+app.get('/', (request, response) => {
+    const conex = connect();
+    const statement = 'select id, title, description, price form product';
+    conex.query(statement, (error, products) => {
+        console.log(error);
+        console.log(products);
+        response.send(products);
+    });
+});
 
-// Configuración de puertos HTTP
-const port = process.env.PORT || '3000';
-app.set('port', port);
-
-// Creación de puertos HTTP
-const server = http.createServer(app);
-
-// Escuchaar todos los pedidos del puerto seteados
-server.listen(port, () => console.log(`backend running on port:${port}`));
+app.listen(3000, () => {
+    console.log('Servidor iniciado en el puerto 3000');
+});

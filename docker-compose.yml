@@ -7,6 +7,8 @@ services:
       - "4200:4200" # el puerto del frontend
     container_name: front-container #nombre del contenedor
     restart: always
+    networks:
+      - internal
 
   backend: #nombre del servicio de backend
     build: backend # ruta del dockerfile del backend
@@ -14,10 +16,29 @@ services:
       - "3000:3000" # puerto del backend
     container_name: back-container #nombre del contenedor
     restart: always
+    networks:
+      - internal
     links:
-      - database # enlace al nombre de la base de datos
+      - database # enlace al nombre de la base de d atos
 
   database: # nombre base de datos
-    build: database # ruta del dockerfile de la base de datos
+    build:
+      context: ./database
+    environment:
+      MYSQL_DATABASE: claix
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
     container_name: database-container #nombre del contenedor
     restart: always
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mysql_data:
